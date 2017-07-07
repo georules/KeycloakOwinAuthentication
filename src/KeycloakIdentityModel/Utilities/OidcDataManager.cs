@@ -213,6 +213,16 @@ namespace KeycloakIdentityModel.Utilities
             return new Uri(baseUri.GetLeftPart(UriPartial.Authority) + _options.CallbackPath);
         }
 
+        public string GetCallBackUriString(Uri baseUri)
+        {
+            string hackcallback = new Uri(baseUri.GetLeftPart(UriPartial.Authority) + _options.CallbackPath).ToString();
+            if (!hackcallback.StartsWith("https://"))
+            {
+                hackcallback = hackcallback.Replace("http://", "https://");
+            }
+            return hackcallback;
+        }
+
         public string GetIssuer()
         {
             using (new ReaderGuard(_metadata.Lock))
@@ -278,7 +288,7 @@ namespace KeycloakIdentityModel.Utilities
             // Create parameter dictionary
             var parameters = new Dictionary<string, string>
             {
-                {OpenIdConnectParameterNames.RedirectUri, GetCallbackUri(requestUri).ToString()},
+                {OpenIdConnectParameterNames.RedirectUri, GetCallBackUriString(requestUri)},
                 {OpenIdConnectParameterNames.ResponseType, _options.ResponseType},
                 {OpenIdConnectParameterNames.Scope, _options.Scope},
                 {OpenIdConnectParameterNames.State, state}
@@ -304,7 +314,7 @@ namespace KeycloakIdentityModel.Utilities
             // Create parameter dictionary
             var parameters = new Dictionary<string, string>
             {
-                {OpenIdConnectParameterNames.RedirectUri, GetCallbackUri(baseUri).ToString()},
+                {OpenIdConnectParameterNames.RedirectUri, GetCallBackUriString(baseUri)},
                 {OpenIdConnectParameterNames.GrantType, "authorization_code"},
                 {OpenIdConnectParameterNames.Code, code}
             };
